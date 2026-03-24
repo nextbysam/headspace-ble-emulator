@@ -347,8 +347,12 @@ async def start_dashboard(state, port=3000):
             state.ws_clients.discard(ws)
         return ws
 
+    async def index_handler(request):
+        return web.FileResponse(static_dir / 'index.html')
+
     app.router.add_get('/ws', ws_handler)
-    app.router.add_static('/', static_dir, show_index=True)
+    app.router.add_get('/', index_handler)
+    app.router.add_static('/static', static_dir)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', port)
