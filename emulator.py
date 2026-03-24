@@ -251,47 +251,40 @@ async def setup_ble(state):
 
     server.write_request_func = handle_write(state)
 
+    # CoreBluetooth rule: characteristics with notify (or write) must have value=None (dynamic).
+    # Only pure read-only characteristics can have cached values.
+    RN = GATTCharacteristicProperties.read | GATTCharacteristicProperties.notify
+    R  = GATTCharacteristicProperties.read
+    W  = GATTCharacteristicProperties.write
+    RP = GATTAttributePermissions.readable
+    WP = GATTAttributePermissions.writeable
+
     await server.add_new_service(IMPROV_SERVICE)
-    await server.add_new_characteristic(
-        IMPROV_SERVICE, IMPROV_CURRENT, GATTCharacteristicProperties.read | GATTCharacteristicProperties.notify,
-        bytes([0x02]), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        IMPROV_SERVICE, IMPROV_ERROR, GATTCharacteristicProperties.read | GATTCharacteristicProperties.notify,
-        bytes([0x00]), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        IMPROV_SERVICE, IMPROV_RPC_CMD, GATTCharacteristicProperties.write,
-        None, GATTAttributePermissions.writeable)
-    await server.add_new_characteristic(
-        IMPROV_SERVICE, IMPROV_RPC_RESULT, GATTCharacteristicProperties.read | GATTCharacteristicProperties.notify,
-        bytes([0x00]), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        IMPROV_SERVICE, IMPROV_CAPABILITIES, GATTCharacteristicProperties.read,
-        bytes([0x01]), GATTAttributePermissions.readable)
+    await server.add_new_characteristic(IMPROV_SERVICE, IMPROV_CURRENT, RN, None, RP)
+    await server.add_new_characteristic(IMPROV_SERVICE, IMPROV_ERROR, RN, None, RP)
+    await server.add_new_characteristic(IMPROV_SERVICE, IMPROV_RPC_CMD, W, None, WP)
+    await server.add_new_characteristic(IMPROV_SERVICE, IMPROV_RPC_RESULT, RN, None, RP)
+    await server.add_new_characteristic(IMPROV_SERVICE, IMPROV_CAPABILITIES, R, bytes([0x01]), RP)
 
     await server.add_new_service(DEVMGR_SERVICE)
-    await server.add_new_characteristic(
-        DEVMGR_SERVICE, DEVMGR_DEVICE_INFO, GATTCharacteristicProperties.read,
-        state.encode_device_info(), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        DEVMGR_SERVICE, DEVMGR_BATTERY, GATTCharacteristicProperties.read | GATTCharacteristicProperties.notify,
-        bytes([state.battery_pct, state.battery_charging]), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        DEVMGR_SERVICE, DEVMGR_STORAGE, GATTCharacteristicProperties.read | GATTCharacteristicProperties.notify,
-        state.encode_storage(), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        DEVMGR_SERVICE, DEVMGR_REC_STATE, GATTCharacteristicProperties.read | GATTCharacteristicProperties.notify,
-        state.encode_recording_state(), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        DEVMGR_SERVICE, DEVMGR_REC_CONTROL, GATTCharacteristicProperties.write,
-        None, GATTAttributePermissions.writeable)
-    await server.add_new_characteristic(
-        DEVMGR_SERVICE, DEVMGR_PREVIEW, GATTCharacteristicProperties.read,
-        state.encode_preview_info(), GATTAttributePermissions.readable)
-    await server.add_new_characteristic(
-        DEVMGR_SERVICE, DEVMGR_OPERATOR, GATTCharacteristicProperties.write,
-        None, GATTAttributePermissions.writeable)
+    await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_DEVICE_INFO, R, state.encode_device_info(), RP)
+    await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_BATTERY, RN, None, RP)
+    await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_STORAGE, RN, None, RP)
+    await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_REC_STATE, RN, None, RP)
+    await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_REC_CONTROL, W, None, WP)
+    await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_PREVIEW, R, state.encode_preview_info(), RP)
+    await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_OPERATOR, W, None, WP)
 
     await server.start()
+
+    # Set initial values on dynamic characteristics (after start, so CoreBluetooth accepts them)
+    server.get_characteristic(IMPROV_CURRENT).value = bytes([0x02])
+    server.get_characteristic(IMPROV_ERROR).value = bytes([0x00])
+    server.get_characteristic(IMPROV_RPC_RESULT).value = bytes([0x00])
+    server.get_characteristic(DEVMGR_BATTERY).value = bytes([state.battery_pct, state.battery_charging])
+    server.get_characteristic(DEVMGR_STORAGE).value = state.encode_storage()
+    server.get_characteristic(DEVMGR_REC_STATE).value = state.encode_recording_state()
+
     state.log(f'BLE advertising as "{DEVICE_NAME}" (2 services, 12 characteristics)')
 
     # Periodic battery/storage notifications
