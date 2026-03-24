@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Headspace Emulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Headspace BLE Emulator</h1>
+      <div class="subtitle">Test environment — emulating device protocol</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Connection -->
+    <div class="card full-width">
+      <div class="connection-card">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="connection-text" id="connectionText">Disconnected</span>
+      </div>
+    </div>
+
+    <!-- Device Info -->
+    <div class="card">
+      <div class="card-label">Device</div>
+      <div class="card-row">
+        <span class="label">Serial</span>
+        <span class="value" id="serial">—</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Firmware</span>
+        <span class="value" id="firmware">—</span>
+      </div>
+      <div class="card-row">
+        <span class="label">IP</span>
+        <span class="value" id="ip">—</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Battery</span>
+        <span class="value" id="battery">—</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Storage</span>
+        <span class="value" id="storage">—</span>
+      </div>
+    </div>
+
+    <!-- Operator Info -->
+    <div class="card">
+      <div class="card-label">Operator Info</div>
+      <div class="card-row">
+        <span class="label">Phone</span>
+        <span class="value" id="opPhone">Waiting...</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Height</span>
+        <span class="value" id="opHeight">Waiting...</span>
+      </div>
+      <div class="card-label" style="margin-top: 16px">WiFi Credentials</div>
+      <div class="card-row">
+        <span class="label">SSID</span>
+        <span class="value" id="wifiSSID">Not provisioned</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Password</span>
+        <span class="value" id="wifiPassword">—</span>
+      </div>
+    </div>
+
+    <!-- Recording -->
+    <div class="card full-width">
+      <div class="card-label">Recording</div>
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+        <span class="badge" id="recBadge">IDLE</span>
+        <span class="value" id="recMode" style="font-size: 13px; color: #666;">—</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Elapsed</span>
+        <span class="value" id="recElapsed">00:00</span>
+      </div>
+      <div class="card-row">
+        <span class="label">Recorded</span>
+        <span class="value" id="recBytes">0 KB</span>
+      </div>
+    </div>
+
+    <!-- Event Log -->
+    <div class="card log-card">
+      <div class="card-label">Event Log</div>
+      <div class="log-list" id="logList"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

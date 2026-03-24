@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  background: #000;
+  color: #ccc;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #222;
+}
+
+header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+header .subtitle {
+  font-size: 13px;
+  color: #666;
+  font-weight: 300;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.card-value {
+  font-size: 16px;
+  font-weight: 400;
+  color: #fff;
+  word-break: break-all;
+}
+
+.card-value.dim {
+  color: #444;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+}
+
+.card-row:not(:last-child) {
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.card-row .label {
+  font-size: 13px;
+  color: #666;
+}
+
+.card-row .value {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.card-row .value.dim {
+  color: #444;
+}
+
+/* Connection indicator */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  background: #333;
+  transition: background 0.3s;
+}
+
+.status-dot.connected {
+  background: #fff;
+}
+
+.connection-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.connection-text {
+  font-size: 15px;
+  color: #666;
+  font-weight: 400;
+}
+
+.connection-text.active {
+  color: #fff;
+}
+
+/* Recording badge */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: #1a1a1a;
+  color: #666;
+}
+
+.badge.recording {
+  background: #fff;
+  color: #000;
+}
+
+.badge.stopping {
+  background: #333;
+  color: #999;
+}
+
+/* Event log */
+.log-card {
+  grid-column: 1 / -1;
+}
+
+.log-list {
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.log-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.log-list::-webkit-scrollbar-track {
+  background: #111;
+}
+
+.log-list::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 2px;
+}
+
+.log-entry {
+  display: flex;
+  gap: 12px;
+  padding: 2px 0;
+  border-bottom: 1px solid #0d0d0d;
+}
+
+.log-time {
+  color: #444;
+  font-family: 'Lato', monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.log-msg {
+  color: #999;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
