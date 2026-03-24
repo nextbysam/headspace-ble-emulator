@@ -45,7 +45,7 @@ DEVICE_NAME = 'HS-TEST'
 # ─── State ────────────────────────────────────────────────
 
 class EmulatorState:
-    def __init__(self, local_ip):
+    def __init__(self, local_ip, loop=None):
         self.ble_connected = False
         self.serial = 'AWL-TEST-0001'
         self.firmware = '1.0.0'
@@ -69,6 +69,7 @@ class EmulatorState:
         self.ws_clients = set()
         self._rec_task = None
         self.server = None  # BlessServer ref
+        self.loop = loop  # main asyncio event loop
 
     def log(self, msg):
         entry = {'time': datetime.now().isoformat(), 'message': msg}
@@ -104,6 +105,12 @@ class EmulatorState:
 
     def broadcast(self):
         data = json.dumps(self.snapshot())
+        if self.loop and self.loop.is_running():
+            self.loop.call_soon_threadsafe(self._do_broadcast, data)
+        else:
+            self._do_broadcast(data)
+
+    def _do_broadcast(self, data):
         for ws in list(self.ws_clients):
             asyncio.ensure_future(ws.send_str(data))
 
@@ -142,7 +149,8 @@ class EmulatorState:
         mode_str = 'local' if mode == 0x01 else 'live_stream'
         self.log(f'Recording started (mode: {mode_str})')
         self._update_ble_recording_state()
-        self._rec_task = asyncio.ensure_future(self._recording_loop())
+        if self.loop:
+            self._rec_task = asyncio.run_coroutine_threadsafe(self._recording_loop(), self.loop)
 
     async def _recording_loop(self):
         while self.rec_state == 0x01:
@@ -158,7 +166,8 @@ class EmulatorState:
         self.rec_state = 0x02
         self.log('Recording stopping...')
         self._update_ble_recording_state()
-        asyncio.ensure_future(self._finish_stop())
+        if self.loop:
+            asyncio.run_coroutine_threadsafe(self._finish_stop(), self.loop)
 
     async def _finish_stop(self):
         await asyncio.sleep(0.5)
@@ -217,7 +226,8 @@ def handle_write(state):
                 state.server.update_value(IMPROV_SERVICE, IMPROV_RPC_RESULT)
                 state.broadcast()
 
-            asyncio.ensure_future(provision())
+            if state.loop:
+                asyncio.run_coroutine_threadsafe(provision(), state.loop)
 
         elif uuid == DEVMGR_REC_CONTROL.upper():
             if len(value) < 1:
@@ -396,7 +406,7 @@ async def main():
     print(f'  Local IP:   {ip}')
     print()
 
-    state = EmulatorState(ip)
+    state = EmulatorState(ip, loop=asyncio.get_event_loop())
     await start_http(state, 8080)
     await start_dashboard(state, 3000)
     await setup_ble(state)
