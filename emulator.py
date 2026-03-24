@@ -275,7 +275,7 @@ async def setup_ble(state):
     await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_PREVIEW, R, state.encode_preview_info(), RP)
     await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_OPERATOR, W, None, WP)
 
-    await server.start()
+    await server.start(prioritize_local_name=False)
 
     # Set initial values on dynamic characteristics (after start, so CoreBluetooth accepts them)
     server.get_characteristic(IMPROV_CURRENT).value = bytes([0x02])
