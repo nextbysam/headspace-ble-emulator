@@ -183,7 +183,8 @@ class EmulatorState:
 
 def handle_write(state):
     def write_request(characteristic, value, **kwargs):
-        uuid = characteristic.uuid.upper()
+        value = bytes(value)  # convert memoryview to bytes
+        uuid = str(characteristic.uuid).upper()
 
         if uuid == IMPROV_RPC_CMD.upper():
             # Parse WiFi credentials
@@ -247,7 +248,7 @@ def handle_write(state):
 
 def handle_read(state):
     def read_request(characteristic, **kwargs):
-        uuid = characteristic.uuid.upper()
+        uuid = str(characteristic.uuid).upper()
 
         if uuid == IMPROV_CURRENT.upper():
             characteristic.value = bytes([state.improv_state])
