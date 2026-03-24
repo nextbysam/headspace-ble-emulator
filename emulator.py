@@ -243,12 +243,38 @@ def handle_write(state):
 
     return write_request
 
+# ─── BLE Read Handler ─────────────────────────────────────
+
+def handle_read(state):
+    def read_request(characteristic, **kwargs):
+        uuid = characteristic.uuid.upper()
+
+        if uuid == IMPROV_CURRENT.upper():
+            characteristic.value = bytes([state.improv_state])
+        elif uuid == IMPROV_ERROR.upper():
+            characteristic.value = bytes([state.improv_error])
+        elif uuid == DEVMGR_DEVICE_INFO.upper():
+            characteristic.value = state.encode_device_info()
+        elif uuid == DEVMGR_BATTERY.upper():
+            characteristic.value = bytes([state.battery_pct, state.battery_charging])
+        elif uuid == DEVMGR_STORAGE.upper():
+            characteristic.value = state.encode_storage()
+        elif uuid == DEVMGR_REC_STATE.upper():
+            characteristic.value = state.encode_recording_state()
+        elif uuid == DEVMGR_PREVIEW.upper():
+            characteristic.value = state.encode_preview_info()
+
+        return characteristic.value
+
+    return read_request
+
 # ─── BLE Setup ────────────────────────────────────────────
 
 async def setup_ble(state):
     server = BlessServer(name=DEVICE_NAME)
     state.server = server
 
+    server.read_request_func = handle_read(state)
     server.write_request_func = handle_write(state)
 
     # CoreBluetooth rule: characteristics with notify (or write) must have value=None (dynamic).
@@ -275,7 +301,7 @@ async def setup_ble(state):
     await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_PREVIEW, R, state.encode_preview_info(), RP)
     await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_OPERATOR, W, None, WP)
 
-    await server.start(prioritize_local_name=False)
+    await server.start(prioritize_local_name=True)
 
     # Set initial values on dynamic characteristics (after start, so CoreBluetooth accepts them)
     server.get_characteristic(IMPROV_CURRENT).value = bytes([0x02])
