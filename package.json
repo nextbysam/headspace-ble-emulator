@@ -1,0 +1,21 @@
+{
+  "name": "headspace-ble-emulator",
+  "version": "1.0.0",
+  "description": "Mac-based BLE test emulator for Headspace device — emulates the full GATT protocol so testers can verify the iOS/Android app flow without hardware",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/verify.js"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@abandonware/bleno": "^0.6.1",
+    "express": "^4.21.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@abandonware/noble": "^1.9.2-24"
+  }
+}
