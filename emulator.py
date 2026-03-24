@@ -40,7 +40,7 @@ DEVMGR_REC_CONTROL  = 'A0467768-6228-2272-4663-277478268105'
 DEVMGR_PREVIEW      = 'A0467768-6228-2272-4663-277478268106'
 DEVMGR_OPERATOR     = 'A0467768-6228-2272-4663-277478268107'
 
-DEVICE_NAME = 'Headspace-TEST'
+DEVICE_NAME = 'HS-TEST'
 
 # ─── State ────────────────────────────────────────────────
 
@@ -301,7 +301,7 @@ async def setup_ble(state):
     await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_PREVIEW, R, state.encode_preview_info(), RP)
     await server.add_new_characteristic(DEVMGR_SERVICE, DEVMGR_OPERATOR, W, None, WP)
 
-    await server.start(prioritize_local_name=True)
+    await server.start(prioritize_local_name=False)
 
     # Set initial values on dynamic characteristics (after start, so CoreBluetooth accepts them)
     server.get_characteristic(IMPROV_CURRENT).value = bytes([0x02])
